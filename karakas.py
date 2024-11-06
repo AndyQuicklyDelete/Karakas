@@ -32,7 +32,7 @@ def display_karakas(event):
     if value == "--- ---":
         n.set('')
     else:
-        for row in cursor.execute("SELECT * FROM karakas WHERE sign_planet_house=?", (value, )):
+        for row in cursor.execute("SELECT * FROM karakas WHERE sign_planet_house=? ORDER BY karaka COLLATE NOCASE ASC", (value, )):
             listbox1.insert(END, row[0])
         listbox1.insert(END, "")
         refresh()
@@ -59,7 +59,7 @@ def get_related_karakas(event):
     value = output.strip()
     value = value[:4]
     
-    for row in cursor.execute("SELECT * FROM karakas WHERE karaka LIKE '%'||?||'%'", (value, )):
+    for row in cursor.execute("SELECT * FROM karakas WHERE karaka LIKE '%'||?||'%' ORDER BY karaka COLLATE NOCASE ASC", (value, )):
         mystr = row[0] + " - " + row[1]
         listbox2.insert(END, mystr)
     listbox2.insert(END, "")
@@ -78,7 +78,7 @@ def display_wordhoard(event):
             
     listbox2.delete(0, END)
             
-    for row in cursor.execute("SELECT * FROM karakas WHERE karaka LIKE '%'||?||'%'", (value, )):
+    for row in cursor.execute("SELECT * FROM karakas WHERE karaka LIKE '%'||?||'%' ORDER BY karaka COLLATE NOCASE ASC", (value, )):
         mystr = row[0] + " - " + row[1]
         listbox2.insert(END, mystr)    
     listbox2.insert(END, "")
@@ -94,7 +94,7 @@ def search(event):
     value = output.strip()
     value = value[:4]
     
-    for row in cursor.execute("SELECT * FROM karakas WHERE karaka LIKE '%'||?||'%'", (value, )):
+    for row in cursor.execute("SELECT * FROM karakas WHERE karaka LIKE '%'||?||'%' ORDER BY karaka COLLATE NOCASE ASC", (value, )):
         mystr = row[0] + " - " + row[1]
         listbox2.insert(END, mystr)
     listbox2.insert(END, "")
