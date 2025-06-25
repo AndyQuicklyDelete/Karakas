@@ -1,22 +1,26 @@
 from tkinter import *
 from tkinter import font
 from tkinter import ttk
-from wordhoard import Synonyms
+#from wordhoard import Synonyms
+from PyMultiDictionary import MultiDictionary
 import sqlite3
 import sys
 import os
 from threading import *
 import platform
 
+def load_file(file_name: str) -> str:
+    return os.path.join(os.path.dirname(__file__), file_name)
+
 if platform.system() == 'Darwin':
     from Cocoa import NSApplication, NSImage
-    if getattr(sys, 'frozen', False):
-        connection = sqlite3.connect(os.path.join(sys._MEIPASS, "starsky.db"), check_same_thread=False)
-    else:
-        connection = sqlite3.connect("starsky.db", check_same_thread=False)
+    # if getattr(sys, 'frozen', False):
+    #     connection = sqlite3.connect(os.path.join(sys._MEIPASS, load_file("starsky.db")), check_same_thread=False)
+    # else:
+    connection = sqlite3.connect(load_file("starsky.db"), check_same_thread=False)
         
 if platform.system() == 'Windows':
-    connection = sqlite3.connect("starsky.db", check_same_thread=False)
+    connection = sqlite3.connect(load_file("starsky.db"), check_same_thread=False)
 
 cursor = connection.cursor()
 
@@ -39,14 +43,17 @@ def display_karakas(event):
 
 
 def related_synonyms(output):
-    synonym = Synonyms(output)
+    dictionary = MultiDictionary(str(output))
+    dictionary.set_words_lang('en') # All words are English
     listbox3.delete(0, END)
-    results = synonym.find_synonyms()
-    if results == "" or results == [] or results == None or "No synonyms" in results or "Please verify" in results:
-        listbox3.insert(END, "No synonyms for this selection")
-    else:
-        for line in results: # for i, line in enumerate(results):
-            listbox3.insert(END, line)
+    results = dictionary.get_synonyms()
+    # if results == "" or results == [] or results == [[]] or results == None:
+    #     listbox3.insert(END, "No synonyms for this selection")
+    # else:
+    if results:
+        for line in results:
+            for line in line:
+                listbox3.insert(END, line)
         listbox3.insert(END, "")
         listbox3.insert(END, "")
         refresh()
@@ -110,29 +117,29 @@ def search(event):
 root = Tk()
 
 if platform.system() == 'Darwin':
-    if getattr(sys, 'frozen', False):
-        ns_application = NSApplication.sharedApplication()
-        logo_ns_image = NSImage.alloc().initByReferencingFile_(os.path.join(sys._MEIPASS, "northstar.icns"))
-        ns_application.setApplicationIconImage_(logo_ns_image)
-    else:
-        ns_application = NSApplication.sharedApplication()
-        logo_ns_image = NSImage.alloc().initByReferencingFile_("northstar.icns")
-        ns_application.setApplicationIconImage_(logo_ns_image)
+    # if getattr(sys, 'frozen', False):
+    #     ns_application = NSApplication.sharedApplication()
+    #     logo_ns_image = NSImage.alloc().initByReferencingFile_(os.path.join(sys._MEIPASS, "northstar.icns"))
+    #     ns_application.setApplicationIconImage_(logo_ns_image)
+    # else:
+    ns_application = NSApplication.sharedApplication()
+    logo_ns_image = NSImage.alloc().initByReferencingFile_(load_file("northstar.icns"))
+    ns_application.setApplicationIconImage_(logo_ns_image)
 
 if platform.system() == 'Windows':
-    root.wm_iconbitmap("favicon.ico")
+    root.wm_iconbitmap(load_file("favicon.ico"))
 
 root.geometry("700x400")
 root.title("Karakas")
 
 if platform.system() == 'Darwin':
-    if getattr(sys, 'frozen', False):
-        root.option_readfile(os.path.join(sys._MEIPASS, "optionDB"))
-    else:
-        root.option_readfile("optionDB")
+    # if getattr(sys, 'frozen', False):
+    #     root.option_readfile(os.path.join(sys._MEIPASS, "optionDB"))
+    # else:
+    root.option_readfile(load_file("optionDB"))
         
 if platform.system() == 'Windows':
-    root.option_readfile("optionDB")
+    root.option_readfile(load_file("optionDB"))
     
 root.option_add("*selectBackground", "#5db2ff")
 root.option_add("*selectForeground", "white")
